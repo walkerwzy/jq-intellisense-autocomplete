@@ -47,7 +47,7 @@ public class ajaxHandler : IHttpHandler
         context.Response.Clear();
         context.Response.ContentType = "text/plain";
 
-        context.Response.Write("[['aa','aa','','aa'],['aa','bb','','aa'],['aa','cc','','aa'],['aa','dd','','aa'],]");
+        context.Response.Write("[['aa','aa','','aa'],['aa','bb','','aa'],['aa','cc','','aa'],['aa','dd','','aa']]");
         context.Response.End();
     }
 
