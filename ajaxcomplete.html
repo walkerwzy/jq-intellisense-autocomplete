@@ -9,7 +9,7 @@
 		#main div{width:500px; margin:30px auto;}
 		input{ border:1px solid gray; width:224px; height:21px;}
 		
-		/*inteligence bo*/
+		/*inteligence box*/
         #suggest{ width:224px; position:absolute; top:0; left:0; background:#fff; border:1px solid #ccc; display:none;}
         #suggest p{  padding:0 3px; background:#fff; cursor:default; height:auto; line-height:21px;}
         #suggest p.highlight{ background:#22f; color:#eee;}
@@ -28,6 +28,7 @@
 			<input type="text" value="" id="txtdoc" />
 			<input type="text" value="" id="txtspe" />
 		</div>
+		简单调用：<input type="text" value="" id="txttest" />
 		<span id="lblmsg"></span>
 	</div>
 </body>
@@ -39,6 +40,9 @@ $(function(){
     $("#txtdoc").autoCmpt({url:"ajaxHandler.ashx?act=doc",multi:true,parentID:"txthos"});
     $("#txtdep").autoCmpt({url:"ajaxHandler.ashx?act=dept",parentID:"txthos"});
     $("#txtspe").autoCmpt({url:"ajaxHandler.ashx?act=spe"});
+    
+    //简单调用
+    $("#txttest").autoCmpt({url:"ajaxHandler.ashx?act=tt"});
 });
 </script>
 </html>
