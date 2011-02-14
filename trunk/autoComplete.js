@@ -46,6 +46,7 @@
         
         $(this).live("focusin",function(){$(this).trigger("keyup");if(options.multi)$(this).addClass("autoCmpt-multi");})
         .val('')//避免刷新页面时出现旧值
+		.attr('autocomplete','off')
         .live("focusout",function(){
             if(!p.data("show")) $("#suggest").hide();//清除提示框
         })
