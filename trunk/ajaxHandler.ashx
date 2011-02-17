@@ -28,6 +28,9 @@ public class ajaxHandler : IHttpHandler
             case "spe":
                 getSpe(context);
                 break;
+            case "blob":
+                blob(context);
+                break;
             default:
                 tt(context);        
                 break;
@@ -42,6 +45,17 @@ public class ajaxHandler : IHttpHandler
         }
     }
 
+    private void blob(HttpContext context)
+    {
+        context.Response.Clear();
+        context.Response.ContentType = "text/plain";
+        
+        XDocument xdoc = XDocument.Load(context.Server.MapPath("doc.xml"));
+
+        context.Response.Write(xdoc.ToString());
+        context.Response.End();
+    }
+    
     private void tt(HttpContext context)
     {
         context.Response.Clear();
