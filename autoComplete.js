@@ -119,31 +119,34 @@
         
         function getSuggest(obj){
             var t=$(obj);
-                var o=t.offset();
-                var h=t.height();
-                var v=t.val().replace(/[\s',，|\\\/。;；]/,'');//去无意义字符
-                if(!options.emptyRequest&&v=='') return;//请求关键词为空是否阻止提交
-                if(options.parentID!='null'){//设置为依赖父ID，则强制检测和更改URL
-                    var pe=$("#"+options.parentID);
-                    var pev=pe.val();
-                    if(!options.usePrentValue) pev=pe.attr("qid")||-1;//如果设置为不使用元素value（默认），则取其qid值，无值则设为-1;
-                    if(pev==''||pev==-1) return;//要求父ID，父ID为空，则拒绝提交
-                }
-                if(t.is(".autoCmpt-q-last")&&v==lastquery){p.show(); return;}//与最后一次请求的发起者和内容相同，直接显示内容
-                
-                $(".autoCmpt-q-last").removeClass("autoCmpt-q-last");
-                var url=options.url;
-                $.get(encodeURI(url),{t:new Date().getMilliseconds(),v:v,pid:pev}, function(data){
-                    t.addClass("autoCmpt-q-last");//标识是最后一个发出请求的元素
-                    var names=eval(data);
-                    var l=$(names).length;
-                    if(l<1) return;
-                    cache_name=names;
-                    cache_length=l;
-                    appendElements(l,names);
-                    lastquery=v;
-                    p.css({left:o.left,top:o.top+h}).show();
-                });
+            if(t.data("xmlhttp")) t.data("xmlhttp").abort();//假如有之前的请求存在，则手动停止它
+            var o=t.offset();
+            var h=t.height();
+            var v=t.val().replace(/[\s',，|\\\/。;；]/,'');//去无意义字符
+            if(!options.emptyRequest&&v=='') return;//请求关键词为空是否阻止提交
+            if(options.parentID!='null'){//设置为依赖父ID，则强制检测和更改URL
+                var pe=$("#"+options.parentID);
+                var pev=pe.val();
+                if(!options.usePrentValue) pev=pe.attr("qid")||-1;//如果设置为不使用元素value（默认），则取其qid值，无值则设为-1;
+                if(pev==''||pev==-1) return;//要求父ID，父ID为空，则拒绝提交
+            }
+            if(t.is(".autoCmpt-q-last")&&v==lastquery){p.show(); return;}//与最后一次请求的发起者和内容相同，直接显示内容
+            
+            $(".autoCmpt-q-last").removeClass("autoCmpt-q-last");
+            var url=options.url;
+            var x=$.get(encodeURI(url),{t:new Date().getMilliseconds(),v:v,pid:pev}, function(data){
+                t.removeData("xmlhttp");//清除ajax请求的xmlHttpRequest对象
+                t.addClass("autoCmpt-q-last");//标识是最后一个发出请求的元素
+                var names=eval(data);
+                var l=$(names).length;
+                if(l<1) return;
+                cache_name=names;
+                cache_length=l;
+                appendElements(l,names);
+                lastquery=v;
+                p.css({left:o.left,top:o.top+h}).show();
+            });
+            t.data("xmlhttp",x);//保存当前ajax请求的xmlHttpRequest对象
         }
         
         $("#moreSuggest").live("mouseup",function(){
