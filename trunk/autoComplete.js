@@ -151,12 +151,13 @@
         
         $("#moreSuggest").live("mouseup",function(){
             var d=$("#moreSuggest").data("datas");
+            if(d==undefined) return;
             appendElements(d.length,d.names);
             $(".autoCmpt-q-last").eq(0).focus();
         });
     		
         //生成提示元素的公用方法
-        function appendElements(lengh,names,e){
+        function appendElements(lengh,names){
             var left=0;
             var n=10;
             var multiColumn=$(".autoCmpt-q-last").hasClass("autoCmpt-multi");
