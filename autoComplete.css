@@ -1,0 +1,7 @@
+/*inteligence box*/
+#suggest{ width:224px; position:absolute; top:0; left:0; background:#fff; border:1px solid #ccc; display:none;}
+#suggest p{  padding:0 3px; background:#fff; cursor:default; height:auto; line-height:21px;}
+#suggest p.highlight{ background:#22f; color:#eee;}
+#suggest .sugtips{color:#888; border-bottom:1px dashed #888; padding-left:5px; line-height:21px;}
+#suggest span.inputcode{float:right;}
+#suggest p.narrow{ float:left; width:50px;}
