@@ -20,7 +20,7 @@
 //              $(obj).autoCmpt({url:url,hidden:$("#hiduid")});
 //              此时传递到后台的仍然是qid，要取hidden元素的值请自行request，本插件只保证了hidden元素的值与qid一致
 //
-//           【注2】写后台事件的时候，根据情况可能需要分别判断一下v和pid是否送了值过来
+//           【注2】写后台事件的时候，根据情况可能需要分别判断一下key和pid是否送了值过来
 //
 //           【注3】后台传回的数据请用多维数组的方式传回：
 //            [
@@ -35,8 +35,11 @@
 // [作    者] walkerwang
 // [邮    箱] walkerwzy@gmail.com
 // [作者博客] http://walkerwang.cnblogs.com
-// [更新日期] 2012-03-09
-// [版 本 号] ver0.4.2
+// [更新日期] 2012-11-01
+// [版 本 号] ver0.4.3
+// 修订历史：
+// 0.4.3
+// 给元素用live方法绑定事件前先解绑了该事件，避免同一页面多个元素调用本插件造成的重复注册
 //====================================================================================================
 (function ($) {
     $.ajaxSetup({ cache: false });
@@ -65,7 +68,7 @@
             var obj = $(this);
             var k = event.keyCode;
             if ($("#suggest").is(":hidden")) {
-                if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40 || k == 46 ) {
+                if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40 || k == 46) {
                     getSuggest(this);
                     return;
                 }
@@ -144,7 +147,7 @@
         * obj:当前文本框
         * clear:表示要不要在提示前保留obj的各种值属性，比如qid
         */
-        function getSuggest(obj,clear) {
+        function getSuggest(obj, clear) {
             var t = $(obj);
             if (!clear) {
                 t.attr("qid", -1);//一得到焦点qid和关联hidden元素就清零，不太适用，暂时关闭
@@ -183,7 +186,7 @@
             t.data("xmlhttp", x); //保存当前ajax请求的xmlHttpRequest对象
         }
 
-        $("#moreSuggest").live("mouseup", function () {
+        $("#moreSuggest").die("mouseup").live("mouseup", function () {
             var d = $("#moreSuggest").data("datas");
             if (d == undefined) return;
             appendElements(d.length, d.names);
@@ -219,16 +222,16 @@
             p.show();
         }
 
-        $("#suggest p").live("mouseover", function () {
+        $("#suggest p").die("mouseover").live("mouseover", function () {
             $(".highlight").removeClass("highlight");
             $(this).addClass("highlight");
             p.data("show", true); //避免触发源失焦造成提示窗口消失
         })
-        .live("mouseout", function () {
+        .die("mouseout").live("mouseout", function () {
             $(this).removeClass("highlight");
             p.data("show", false);
         })
-        .live("click", function () {
+        .die("clieck").live("click", function () {
             var obj = $(".autoCmpt-q-last");
             var v = $(this).find(".sname").html();
             var id = $(this).attr("sid");
@@ -236,7 +239,7 @@
             p.data("show", false);
             p.hide();
         });
-        
+
     };
 
     //默认值
