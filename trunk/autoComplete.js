@@ -35,106 +35,111 @@
 // [作    者] walkerwang
 // [邮    箱] walkerwzy@gmail.com
 // [作者博客] http://walkerwang.cnblogs.com
-// [更新日期] 2012-11-01
-// [版 本 号] ver0.4.3
+// [更新日期] 2013-03-30
+// [版 本 号] ver0.5.1
 // 修订历史：
 // 0.4.3
-// 给元素用live方法绑定事件前先解绑了该事件，避免同一页面多个元素调用本插件造成的重复注册
+// 重复注册事件bug的修复
+// 0.5.1
+// 大量修改了代码
+// 每个元素拥有自己的最后一次查询结果的缓存
+// 一行显示多个结果时强制截断过长的字符，用title显示全部字符
 //====================================================================================================
 (function ($) {
     $.ajaxSetup({ cache: false });
-    $.fn.autoCmpt = function (options) {
-        var options = $.extend({}, $.fn.autoCmpt.defaults, options);
+    $.fn.autoCmpt = function (option) {
+        var options = $.extend({}, $.fn.autoCmpt.defaults, option);
 
-        var lastquery = ""; //上次请求的内容
-        var cache_name = new Array(); //浏览器数据缓存
-        var cache_length;
-
-        var p = null; //智能提示对象
+        var p = null; //智能提示框
         if ($("#suggest").length < 1) p = $("<div/>", { "id": "suggest" }).appendTo("body"); //生成提示框
         else p = $("#suggest");
 
-        $(this).live("focusin", function () {
-            $(this).trigger("keyup"); if (options.multi) $(this).addClass("autoCmpt-multi"); if ($(options.hidden).length > 0) $(this).data("hid", $(options.hidden));
-        })
-        //.val('')//避免刷新页面时出现旧值
-		.attr('autocomplete', 'off')
-        .addClass("txt_auto")
-        .live("focusout", function () {
-            if (!p.data("show")) $("#suggest").hide(); //清除提示框
-            if ($.trim($(this).val()) == "") setValue($(this), "", -1);
-        })
-        .live("keyup", function (event) {
-            var obj = $(this);
-            var k = event.keyCode;
-            if ($("#suggest").is(":hidden")) {
-                if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40 || k == 46) {
-                    getSuggest(this);
-                    return;
-                }
-                if ((typeof (k) == "undefined")) {
-                    getSuggest(this, true);
-                    return;
-                }
-            }
-            else {
-                //37:left,39:right;40:down,38:up,27:esc,9:tab
-                if (k == 39) k = 40;
-                if (k == 37) k = 38;
-                if (k == 9) k = 27;
-                var curobj;
-                switch (k) {
-                    case 40: //down
-                        var o = $(".highlight");
-                        var v;
-                        if (o.length == 0) {
-                            curobj = $("#suggest p:first");
-                            v = curobj.addClass("highlight").find(".sname").html();
-                        } else {
-                            curobj = o.eq(0).removeClass("highlight").next("p");
-                            v = curobj.addClass("highlight").find(".sname").html();
-                            if (v == null) {
-                                curobj = $("#suggest p:first");
-                                v = curobj.addClass("highlight").find(".sname").html();
-                                $("#moreSuggest").removeClass("highlight");
-                            }
-                        }
-                        id = curobj.attr("sid");
-                        setValue(obj, v, id);
-                        break;
-                    case 38: //up
-                        var o = $(".highlight");
-                        var v;
-                        if (o.length == 0) {
-                            curobj = $("#suggest p:last");
-                            v = curobj.addClass("highlight").find(".sname").html();
-                        } else {
-                            curobj = o.filter(":last").removeClass("highlight").prev("p");
-                            v = curobj.addClass("highlight").find(".sname").html();
-                        }
-                        if (v == null) {
-                            curobj = $("#suggest p:last").removeClass("highlight").prev("p");
-                            v = curobj.addClass("highlight").find(".sname").html();
-                        }
-                        id = curobj.attr("sid");
-                        setValue(obj, v, id);
-                        break;
-                    case 27: //escape
-                        obj.val("");
-                        $("#suggest").hide();
-                        break;
-                    case 13: //enter
-                        //$("#btn_Query").click();
-                        //return false;
-                        break;
-                    default:
-                        if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40) {
+        $(this).each(function () {
+            $(this).live("focusin", function () {
+                $(this).trigger("keyup");
+                if (options.multi) $(this).addClass("autoCmpt-multi");
+                if ($(options.hidden).length > 0) $(this).data("hid", $(options.hidden));
+            })
+                //.val('')//避免刷新页面时出现旧值
+                .attr('autocomplete', 'off')
+                .addClass("txt_auto")
+                .live("focusout", function () {
+                    if (!p.data("show")) $("#suggest").hide(); //清除提示框
+                    if ($.trim($(this).val()) == "") setValue($(this), "", -1);
+                })
+                .live("keyup", function (event) {
+                    var obj = $(this);
+                    var k = event.keyCode;
+                    if ($("#suggest").is(":hidden")) {
+                        if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40 || k == 46) {
                             getSuggest(this);
+                            return;
                         }
-                        break;
-                }
+                        if ((typeof (k) == "undefined")) {
+                            getSuggest(this, true);
+                            return;
+                        }
+                    } else {
+                        //37:left,39:right;40:down,38:up,27:esc,9:tab
+                        if (k == 39) k = 40;
+                        if (k == 37) k = 38;
+                        if (k == 9) k = 27;
+                        var curobj, o, v;
+                        switch (k) {
+                            case 40:
+                                //down
+                                o = $(".highlight");
+                                if (o.length == 0) {
+                                    curobj = $("#suggest p:first");
+                                    v = curobj.addClass("highlight").find(".sname").html();
+                                } else {
+                                    curobj = o.eq(0).removeClass("highlight").next("p");
+                                    v = curobj.addClass("highlight").find(".sname").html();
+                                    if (v == null) {
+                                        curobj = $("#suggest p:first");
+                                        v = curobj.addClass("highlight").find(".sname").html();
+                                        $("#moreSuggest").removeClass("highlight");
+                                    }
+                                }
+                                id = curobj.attr("sid");
+                                setValue(obj, v, id);
+                                break;
+                            case 38:
+                                //up
+                                o = $(".highlight");
+                                if (o.length == 0) {
+                                    curobj = $("#suggest p:last");
+                                    v = curobj.addClass("highlight").find(".sname").html();
+                                } else {
+                                    curobj = o.filter(":last").removeClass("highlight").prev("p");
+                                    v = curobj.addClass("highlight").find(".sname").html();
+                                }
+                                if (v == null) {
+                                    curobj = $("#suggest p:last").removeClass("highlight").prev("p");
+                                    v = curobj.addClass("highlight").find(".sname").html();
+                                }
+                                id = curobj.attr("sid");
+                                setValue(obj, v, id);
+                                break;
+                            case 27:
+                                //escape
+                                obj.val("");
+                                $("#suggest").hide();
+                                break;
+                            case 13:
+                                //enter
+                                //$("#btn_Query").click();
+                                //return false;
+                                break;
+                            default:
+                                if ((k >= 65 && k <= 90) || k == 8 || k == 32 || (k >= 48 && k <= 57) || k == 186 || k == 222 || k == 40) {
+                                    getSuggest(this);
+                                }
+                                break;
+                        }
 
-            }
+                    }
+                });
         });
         function setValue(obj, v, id) {
             if (v == "更多...") return;
@@ -154,33 +159,42 @@
                 if (t.data("hid") != undefined) t.data("hid").val(-1);
             }
             if (t.data("xmlhttp")) t.data("xmlhttp").abort(); //假如有之前的请求存在，则手动停止它
-            var o = t.offset();
-            var h = t.height();
-            var v = t.val().replace(/[\s',，|\\\/。;；]/, ''); //去无意义字符
+            var o = t.offset(),
+                h = t.height(),
+                v = t.val().replace(/[\s',，|\\\/。;；]/, ''), //去无意义字符
+                pev = null;
             if (!options.emptyRequest && v == '') return; //请求关键词为空是否阻止提交
             if (options.parentID != 'null') {//设置为依赖父ID，则强制检测和更改URL
                 var pe = $("#" + options.parentID);
-                var pev = pe.val();
+                pev = pe.val();
                 if (!options.usePrentValue) pev = pe.attr("qid") || -1; //如果设置为不使用元素value（默认），则取其qid值，无值则设为-1;
                 if (pev == '' || pev == -1) return; //要求父ID，父ID为空，则拒绝提交
             }
-            if (t.is(".autoCmpt-q-last") && v == lastquery) { p.show(); return; } //与最后一次请求的发起者和内容相同，直接显示内容
-            $(".autoCmpt-q-last").removeClass("autoCmpt-q-last");
+            //判断该元素的请求是否与上次相同，如果是则从缓存里取出内容
+            var cachedData = t.data('caches');
+            if (typeof cachedData != 'undefined' && cachedData.datas && cachedData.query == v) {
+                appendElements(cachedData.datas);
+                $(".autoCmpt-q-last").removeClass("autoCmpt-q-last");
+                //标识是最后一个发出请求的元素
+                t.addClass("autoCmpt-q-last");
+                p.css({ left: o.left, top: o.top + h }).width(options.width).show();
+                return;
+            }
             var url = options.url;
             //如果服务器接的参数名不是key和pid，请于此处更改
             var x = $.get(encodeURI(url), { key: v, pid: pev }, function (data) {
                 t.removeData("xmlhttp"); //清除ajax请求的xmlHttpRequest对象
                 t.addClass("autoCmpt-q-last"); //标识是最后一个发出请求的元素
-                var names = eval(data);
-                var l = $(names).length;
-                if (l < 1) {
+                var d = eval(data);
+                if (d.length < 1) {
                     $("#suggest").hide();
                     return;
                 }
-                cache_name = names;
-                cache_length = l;
-                appendElements(l, names);
-                lastquery = v;
+                t.data('caches', { datas: d, query: v });
+                appendElements(d);
+                //标识是最后一个发出请求的元素
+                $(".autoCmpt-q-last").removeClass("autoCmpt-q-last");
+                t.addClass("autoCmpt-q-last");
                 p.css({ left: o.left, top: o.top + h }).width(options.width).show();
             });
             t.data("xmlhttp", x); //保存当前ajax请求的xmlHttpRequest对象
@@ -189,37 +203,40 @@
         $("#moreSuggest").die("mouseup").live("mouseup", function () {
             var d = $("#moreSuggest").data("datas");
             if (d == undefined) return;
-            appendElements(d.length, d.names);
+            appendElements(d);
             $(".autoCmpt-q-last").eq(0).focus();
         });
 
         //生成提示元素的公用方法
-        function appendElements(lengh, names) {
-            var left = 0;
-            var n = 10;
-            var multiColumn = $(".autoCmpt-q-last").hasClass("autoCmpt-multi");
+        function appendElements(datas) {
+            if (!$.isArray(datas)) return;
+            var left = 0,
+                n = 10,
+                multiColumn = $(".autoCmpt-q-last").hasClass("autoCmpt-multi"),
+                length = datas.length;
             if (multiColumn) {
                 n = 32;
             }
             p.empty();
-            for (var i = 0; i < n && i < lengh; i++) {
-                p.append("<p sid=\"" + $(names)[i][0] + "\" pid=\"" + $(names)[i][3] + "\"><span class=\"inputcode\">" + $(names)[i][2] + "</span><span class=\"sname\">" + $(names)[i][1] + "</span></p>");
+            for (var i = 0; i < n && i < length; i++) {
+                p.append("<p sid=\"" + datas[i][0] + "\" pid=\"" + datas[i][3] + "\"><span class=\"inputcode\">" + datas[i][2] + "</span><span class=\"sname\">" + datas[i][1] + "</span></p>");
             }
-            if (lengh > n) {
-                left = lengh - n;
+            if (length > n) {
                 p.append("<p id=\"moreSuggest\" sid=\"-1\">更多...</p>");
-                $("#moreSuggest").data("datas", { length: left, names: names.slice(9) });
+                $("#moreSuggest").data("datas", datas.slice(n - 1));
             }
-            if (multiColumn && lengh > 10) {
-                p.find("p").addClass("narrow");
-                p.find(".inputcode").hide();
+            if (multiColumn && length > 10) {
+                p.find("p").addClass("narrow")
+                 .find(".inputcode").hide()
+                 .end()
+                 .find(".sname").attr('title', function () { return $(this).text(); })
             }
             else {
                 $(".narrow").removeClass("narrow");
                 p.find(".inputcode").show();
             }
-            p.prepend("<div class='sugtips'>输入中文/拼音首字母或方向键选择</div>");
-            p.show();
+            p.prepend("<div class='sugtips'>输入中文/拼音首字母或方向键选择</div>")
+             .show();
         }
 
         $("#suggest p").die("mouseover").live("mouseover", function () {
@@ -231,7 +248,7 @@
             $(this).removeClass("highlight");
             p.data("show", false);
         })
-        .die("clieck").live("click", function () {
+        .die("click").live("click", function () {
             var obj = $(".autoCmpt-q-last");
             var v = $(this).find(".sname").html();
             var id = $(this).attr("sid");
@@ -251,5 +268,5 @@
         multi: false, //是否一列提示多个
         hidden: "", //关联的表单控件，如hidden或textbox，含有val属性即可，可以是DOM元素，或jQuery对象
         width: 224//默认宽度
-    }
+    };
 })(jQuery);
