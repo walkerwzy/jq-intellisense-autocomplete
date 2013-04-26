@@ -20,7 +20,7 @@
             var t = $(this), o = $(this);
             if (options.handler) o = $(options.handler, this);
             o.die('mousedown').live('mousedown', function (e) {
-                t.data({ position: { offset: o.offset(), eventx: e.pageX, eventy: e.pageY } }).addClass(el);
+                t.data('position', { offset: o.offset(), eventx: e.pageX, eventy: e.pageY }).addClass(el);
                 if (options.outer) t.addClass(outer);
             }).css('cursor', 'move');;
         });
