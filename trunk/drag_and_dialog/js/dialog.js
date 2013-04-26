@@ -75,7 +75,8 @@ var dialog = function (conf) {
         self.dialog.css({ top: '50%', left: '50%', marginLeft: function () { return 0 - parseInt($(this).width() / 2, 10) + getStackedMargin(); }, marginTop: function () { return 0 - parseInt($(this).height() / 2, 10) + getStackedMargin() - 80; } });
     },
     setIFrameWH = function () {
-        if (self.options.iframe) getDialogBody().find('iframe').css({ width: body.width(), height: body.height() });
+        var body = getDialogBody();
+        body.find('iframe').css({ width: body.width(), height: body.height() });
     },
     showLoading = function () {
         getDialogBody().html('<span class="dlg-loading">' + self.options.loading + '</span>');
