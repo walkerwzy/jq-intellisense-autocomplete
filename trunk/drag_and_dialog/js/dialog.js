@@ -53,7 +53,7 @@ var dialog = function (conf) {
         close: { cursor: 'pointer' },
         body: { backgroundColor: '#fff', overflow: 'hidden' },
         loading: {},
-        resize: { position: 'absolute', right: 0, bottom: 0, width: 8, height: 8, cursor: 'nw-resize' }
+        resize: { position: 'absolute', right: 0, bottom: 0, width: 15, height: 15, cursor: 'nw-resize' }
     },
     getActiveDialog = function () {
         return $($('.dlg-container').get().sort(function (a, b) { return parseInt($(b).css('z-index'), 10) - parseInt($(a).css('z-index'), 10); })[0]);
@@ -74,11 +74,14 @@ var dialog = function (conf) {
     setDialogCentral = function () {
         self.dialog.css({ top: '50%', left: '50%', marginLeft: function () { return 0 - parseInt($(this).width() / 2, 10) + getStackedMargin(); }, marginTop: function () { return 0 - parseInt($(this).height() / 2, 10) + getStackedMargin() - 80; } });
     },
+    setIFrameWH = function () {
+        if (self.options.iframe) getDialogBody().find('iframe').css({ width: body.width(), height: body.height() });
+    },
     showLoading = function () {
-        self.dialog.find('.dlg-body').html('<span class="dlg-loading">' + self.options.loading + '</span>');
+        getDialogBody().html('<span class="dlg-loading">' + self.options.loading + '</span>');
     },
     hideLoading = function () {
-        self.dialog.find('.dlg-body').find('.dlg-loading').remove();
+        getDialogBody().find('.dlg-loading').remove();
     };
 
     //create cover
@@ -139,7 +142,7 @@ var dialog = function (conf) {
     if (self.options.resizable) {
         self.dialog.find('.dlg-resize')
         .off('mousedown').on('mousedown', function (e) {
-            var body = self.dialog.find('.dlg-body');
+            var body = getDialogBody();
             $("." + resizeObj).removeClass(resizeObj);
             $(this).data({
                 startx: e.pageX,
@@ -159,7 +162,7 @@ var dialog = function (conf) {
                 width: function () { return parseInt(o.data('width'), 10) + x; },
                 height: function () { return parseInt(o.data('height'), 10) + y; }
             });
-            if (self.options.iframe) body.find('iframe').css({ width: body.width(), height: body.height() });
+            setIFrameWH();
         })
         .on('mouseup', function () {
             $('.' + resizeObj).removeClass(resizeObj);
@@ -171,7 +174,7 @@ var dialog = function (conf) {
     //methods
     //load contents and show dialog
     self.show = function () {
-        var body = self.dialog.find('.dlg-body');
+        var body = getDialogBody();
         if (self.options.html) {
             body.html(self.options.html);
         } else if (self.options.ajax) {
@@ -195,7 +198,7 @@ var dialog = function (conf) {
     };
     //close the dialog
     self.close = function () {
-        if (self.cover) self.cover.hide();
+        if (self.cover) self.cover.remove();
         self.dialog.remove();
         $('.dlg-active').removeClass('dlg-active');
         getActiveDialog().addClass('dlg-active');
@@ -209,20 +212,20 @@ var dialog = function (conf) {
     };
     //maximum
     //@nocache:是否不缓存调整前窗体的大小
-    self.maxWindow = function (remember) {
+    self.maxWindow = function (nocache) {
         if (!self.options.maximum || maxed) return;
         self.dialog.find('.dlg-max').hide();
         var body = getDialogBody(),
             width = body.width(),
             height = body.height();
-        if (!remember) body.data({ before: { width: width, height: height } });
+        if (!nocache) body.data('before', { width: width, height: height });
         body.css({
             width: function () { return $(window).width() - 15; },
             height: function () { return $(window).height() - self.dialog.find('.dlg-header').height() - self.dialog.find('.dlg-footer').height() - 15; }
         });
         self.dialog.css({ top: 3, left: 5, margin: 0 })
         .find('.dlg-restore').css({ display: 'inline-block' });
-        if (self.options.iframe) body.find('iframe').css({ width: body.width(), height: body.height() });
+        setIFrameWH();
         maxed = true;
     };
     //restore
@@ -235,7 +238,7 @@ var dialog = function (conf) {
         body.css({ width: original.width, height: original.height });
         setDialogCentral();
         self.dialog.find('.dlg-max').css({ display: 'inline-block' });
-        if (self.options.iframe) body.find('iframe').css({ width: body.width(), height: body.height() });
+        setIFrameWH();
         maxed = false;
     }
 
