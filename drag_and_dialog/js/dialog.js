@@ -225,7 +225,8 @@ var dialog = function (conf) {
             height: function () { return $(window).height() - self.dialog.find('.dlg-header').height() - self.dialog.find('.dlg-footer').height() - 15; }
         });
         self.dialog.css({ top: 3, left: 5, margin: 0 })
-        .find('.dlg-restore').css({ display: 'inline-block' });
+            .find('.dlg-restore').css({ display: 'inline-block' })
+            .end().find('.dlg-resize').hide();
         setIFrameWH();
         maxed = true;
     };
@@ -238,7 +239,7 @@ var dialog = function (conf) {
         if (!original) original = { width: 600, height: 320 };
         body.css({ width: original.width, height: original.height });
         setDialogCentral();
-        self.dialog.find('.dlg-max').css({ display: 'inline-block' });
+        self.dialog.find('.dlg-max').css({ display: 'inline-block' }).end().find('.dlg-resize').show();
         setIFrameWH();
         maxed = false;
     }
