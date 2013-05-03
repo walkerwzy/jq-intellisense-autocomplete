@@ -74,15 +74,13 @@ var dialog = function (conf) {
     setDialogCentral = function () {
         self.dialog.css({ top: '50%', left: '50%', marginLeft: function () { return 0 - parseInt($(this).width() / 2, 10) + getStackedMargin(); }, marginTop: function () { return 0 - parseInt($(this).height() / 2, 10) + getStackedMargin() - 80; } });
     },
-    setWEightHEight = function () {
+    setWeightHeight = function () {
         var body = getDialogBody();
         //iframe
         body.find('iframe').css({ width: body.width(), height: body.height() });
         //ie6,7 bugfix,
-        if($.browser.msie && parseInt($.browser.version,10)<8){
-            var body=getDialogBody();
-            self.dialog.css({width:body.width(),height:body.height()});
-        }
+        if ($.browser.msie && parseInt($.browser.version, 10) < 8)
+            self.dialog.css({ width: body.width(), height: body.height() });
     },
     showLoading = function () {
         getDialogBody().html('<span class="dlg-loading">' + self.options.loading + '</span>');
@@ -108,7 +106,7 @@ var dialog = function (conf) {
     self.dialog = $("#" + self.id);
 
     //apply style
-    self.dialog.css(css.container).css({width:self.options.width})
+    self.dialog.css(css.container).css({ width: self.options.width })
         .find('.dlg-close').css(css.close)
         .end().find('.dlg-body').css(css.body).css({ width: self.options.width, height: self.options.height })
         .end().find('.dlg-resize').css(css.resize)
@@ -169,7 +167,7 @@ var dialog = function (conf) {
                 width: function () { return parseInt(o.data('width'), 10) + x; },
                 height: function () { return parseInt(o.data('height'), 10) + y; }
             });
-            setWEightHEight();
+            setWeightHeight();
         })
         .on('mouseup', function () {
             $('.' + resizeObj).removeClass(resizeObj);
@@ -233,7 +231,7 @@ var dialog = function (conf) {
         self.dialog.css({ top: 3, left: 5, margin: 0 })
             .find('.dlg-restore').css({ display: 'inline-block' })
             .end().find('.dlg-resize').hide();
-        setWEightHEight();
+        setWeightHeight();
         maxed = true;
     };
     //restore
@@ -246,7 +244,7 @@ var dialog = function (conf) {
         body.css({ width: original.width, height: original.height });
         setDialogCentral();
         self.dialog.find('.dlg-max').css({ display: 'inline-block' }).end().find('.dlg-resize').show();
-        setWEightHEight();
+        setWeightHeight();
         maxed = false;
     }
 
