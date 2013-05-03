@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title>demo</title>
     <style>
-    body{overflow-y: scroll;}
+        body{overflow-y: scroll;}
         .dlg-cover{height: 100%; width: 100%; opacity:0.5; background-color: #fff; position: fixed;top:0; left:0; display: none; z-index:99999;}
         .dlg-container{position: absolute; top:0; left:0; box-shadow:5px 5px 3px #888; border:1px solid #aaa; border-radius: 5px; z-index:100000;}
         .dlg-container .dlg-header{height:24px; overflow: hidden; background-color: #eee; padding:3px 5px;}
         .dlg-container .dlg-header .dlg-icon{float:left; width:24px;}
         .dlg-container .dlg-header .dlg-title{float:left; font-weight: 600;}
         .dlg-container .dlg-header .dlg-op{float:right; height:24px;}
-        .dlg-container .dlg-header .dlg-op .dlg-max,.dlg-container .dlg-header .dlg-op .dlg-restore,.dlg-container .dlg-header .dlg-op .dlg-close{display:inline-block; width:24px; height:24px; overflow: hidden; background:transparent url(img/icon_max.png) -2px -2px no-repeat;  cursor:pointer;}
+        .dlg-container .dlg-header .dlg-op .dlg-max,.dlg-container .dlg-header .dlg-op .dlg-restore,.dlg-container .dlg-header .dlg-op .dlg-close{display:inline-block; width:24px; height:24px; overflow: hidden; background:transparent url(img/icon_max.png) -2px -2px no-repeat;  cursor:pointer; }
         .dlg-container .dlg-header .dlg-op .dlg-restore{background-image: url(img/icon_restore.png); display: none;}
         .dlg-container .dlg-header .dlg-op .dlg-close{background: url(img/icon_close.gif) 3px 4px no-repeat;}
         .dlg-container .dlg-header .dlg-op .dlg-close:hover{transition:transform 10s ease-in 0s; transform:rotate(36000deg); }
@@ -50,6 +50,7 @@
 <script type="text/javascript">
 $(function(){
     $(".test").css({border:'1px solid gray',borderRadius:5,width:135,background:'#dd1',padding:8}).dragable();
+    // alert($.browser.msie +"," +$.browser.version);
 });
 var dl1,dl2,dl3,dl4,dl5,dl6,dl7,dl8,
 margin={bottom:5,right:5};
