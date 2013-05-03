@@ -80,7 +80,7 @@ var dialog = function (conf) {
         body.find('iframe').css({ width: body.width(), height: body.height() });
         //ie6,7 bugfix,
         if ($.browser.msie && parseInt($.browser.version, 10) < 8)
-            self.dialog.css({ width: body.width(), height: body.height() });
+            self.dialog.css({ width: body.width() });
     },
     showLoading = function () {
         getDialogBody().html('<span class="dlg-loading">' + self.options.loading + '</span>');
@@ -106,7 +106,7 @@ var dialog = function (conf) {
     self.dialog = $("#" + self.id);
 
     //apply style
-    self.dialog.css(css.container).css({ width: self.options.width })
+    self.dialog.css(css.container)
         .find('.dlg-close').css(css.close)
         .end().find('.dlg-body').css(css.body).css({ width: self.options.width, height: self.options.height })
         .end().find('.dlg-resize').css(css.resize)
@@ -194,6 +194,9 @@ var dialog = function (conf) {
 
         //position          
         setDialogCentral();
+
+        //for ie6,7
+        setWeightHeight();
 
         //set active
         $(".dlg-active").removeClass('dlg-active');
