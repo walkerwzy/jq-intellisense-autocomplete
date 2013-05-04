@@ -232,6 +232,7 @@ var dialog = function (conf) {
             .end().find('.dlg-resize').hide();
         setWeightHeight();
         maxed = true;
+        return self;
     };
     //restore
     self.restoreWindow = function () {
@@ -249,6 +250,7 @@ var dialog = function (conf) {
         self.dialog.find('.dlg-max').css({ display: 'inline-block' }).end().find('.dlg-resize').show();
         setWeightHeight();
         maxed = false;
+        return self;
     }
 
     return self;
