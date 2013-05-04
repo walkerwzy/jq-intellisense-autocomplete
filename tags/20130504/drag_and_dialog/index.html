@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <style>
+        body{overflow-y: scroll;}
+        .dlg-cover{height: 100%; width: 100%; opacity:0.5; background-color: #fff; position: fixed;top:0; left:0; display: none; z-index:99999;}
+        .dlg-container{position: absolute; top:0; left:0; box-shadow:5px 5px 3px #888; border:1px solid #aaa; border-radius: 5px; z-index:100000;}
+        .dlg-container .dlg-header{height:24px; overflow: hidden; background-color: #eee; padding:3px 5px;}
+        .dlg-container .dlg-header .dlg-icon{float:left; width:24px;}
+        .dlg-container .dlg-header .dlg-title{float:left; font-weight: 600;}
+        .dlg-container .dlg-header .dlg-op{float:right; height:24px;}
+        .dlg-container .dlg-header .dlg-op .dlg-max,.dlg-container .dlg-header .dlg-op .dlg-restore,.dlg-container .dlg-header .dlg-op .dlg-close{display:inline-block; width:24px; height:24px; overflow: hidden; background:transparent url(img/icon_max.png) -2px -2px no-repeat;  cursor:pointer; }
+        .dlg-container .dlg-header .dlg-op .dlg-restore{background-image: url(img/icon_restore.png); display: none;}
+        .dlg-container .dlg-header .dlg-op .dlg-close{background: url(img/icon_close.gif) 3px 4px no-repeat;}
+        .dlg-container .dlg-header .dlg-op .dlg-close:hover{transition:transform 10s ease-in 0s; transform:rotate(36000deg); }
+        .dlg-container .dlg-body{width:600px;height:320px; background-color: #fff; overflow:hidden;}
+        .dlg-container .dlg-body .dlg-loading{ position: absolute; top:45%; left:48%; display: block; width:16px; height:11px; background: transparent url(img/loading.gif) 0 0 no-repeat;}
+        .dlg-container .dlg-footer{height:40px; background-color: #eee; text-align: right; position: relative; padding-right:3px;}
+        .dlg-container .dlg-footer .dlg-btn{display:inline-block;padding:3px 5px;min-width:40px; text-decoration:none;border:1px solid gray;border-radius:5px; margin:8px; background-color: #eee; color:#333; outline: none; text-align: center;}
+        .dlg-container .dlg-footer .dlg-btn:hover{background-color: #fff;color:#67a;}
+        .dlg-container .dlg-footer .dlg-resize{position: absolute; right:0; bottom:0; width:15px; height:15px; cursor: nw-resize; background:transparent url(img/resize.png) right bottom no-repeat;}
+        .dlg-active .dlg-header, .dlg-active .dlg-footer{background-color: #ccc;}
+    </style>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <style>
+        *{behavior: url(js/PIE.htc);}
+    </style>
+    <![endif]-->
+</head>
+<body>
+    <div class="test">$('.test').dragable();</div>
+    <button onclick='showdl1();'>普通调用</button><button onclick="dl1.close();">hide</button><br/>
+    <button onclick='showdl2();'>本站页面ajax调用，及禁用拖动窗体</button><button onclick="dl2.close();">hide</button><br/>
+    <button onclick='showdl3();'>跨站iframe调用</button><button onclick="dl3.close();">hide</button><button onclick='dl3.maxWindow();'>最大化</button><input type="text" id="url" value='http://www.jd.com'/> <br/>
+    <button onclick='showdl4();'>可调窗体大小</button><button onclick="dl4.close();">hide</button><br/>
+    <button onclick='showdl5();'>自定义初始窗体大小</button><button onclick="dl5.close();">hide</button><br/>
+    <button onclick='showdl6();'>加自定义按钮，及禁用最大化</button><button onclick="dl6.close();">hide</button><button onclick='dl6.maxWindow();'>禁用最大化后，函数调用与无效</button><br/>
+    <button onclick='showdl7();'>加遮罩层</button><button onclick="dl7.close();">hide</button><br/>
+    <button onclick='showdl8();'>允许移到窗体外</button><button onclick="dl8.close();">hide</button><br/>
+    <button onclick="$('.dlg-container').hide();">hide all</button><button onclick="$('.dlg-container').show();">show all</button>
+</body>
+<script type="text/javascript" src="js/jquery.js"></script>
+<!--[if (gte IE 6)&(lte IE 8)]>
+<script type="text/javascript" src="js/pie.js"></script>
+<![endif]-->
+<script type="text/javascript" src="js/dragable.js"></script>
+<script type="text/javascript" src="js/dialog.js"></script>
+<script type="text/javascript">
+$(function(){
+    $(".test").css({border:'1px solid gray',borderRadius:5,width:135,background:'#dd1',padding:8}).dragable();
+    // alert($.browser.msie +"," +$.browser.version);
+});
+var dl1,dl2,dl3,dl4,dl5,dl6,dl7,dl8,
+margin={bottom:5,right:5};
+function showdl1(){dl1=new dialog({html:'送入字符串',dragMargin:margin}).show();}
+function showdl2(){dl2=new dialog({ajax:'page1.html',dragable:false}).show();}
+function showdl3(){dl3=new dialog({iframe:$('#url').val(),dragMargin:margin}).show();}
+function showdl4(){dl4=new dialog({html:'可以调窗体大小，双击标题栏最大化',resizable:true,dragMargin:margin}).show();}
+function showdl5(){dl5=new dialog({html:'自定义初始窗体大小',width:300,height:200,dragMargin:margin}).show();}
+function showdl6(){
+    dl6=new dialog({maximum:false})
+    .addBtn('ok',function(){alert('ok clicked');})
+    .addBtn('cancel',function(){dl6.close();})
+    .show();
+}
+function showdl7(){dl7=new dialog({html:'有遮罩层',cover:true,dragMargin:margin}).show();}
+function showdl8(){dl8=new dialog({html:'可以移出边界',outer:true})
+.addBtn('cancel',function(){dl8.close();}).show();}
+</script>
+</html>
