@@ -3,7 +3,7 @@
 // [邮    箱] walkerwzy@gmail.com
 // [作者博客] http://walkerwang.cnblogs.com
 // [更新日期] 2013-4-26
-// [版 本 号] v 0.1.1
+// [版 本 号] v 0.1.3
 // [使用方法]
 // var d=new dialog(options).show();
 //=====================================================================================
@@ -21,17 +21,13 @@ var dialog = function (conf) {
             width: 600,//弹窗宽度
             height: 320,//弹窗高度
             outer: false,//允许弹窗被拖到窗体可见区域外
-            dragMargin: {},//如果outer=false，设定弹窗与窗体四周的边距
+            dragMargin: { top: 0, bottom: 0, left:0, right:0 },//如果outer=false，设定弹窗与窗体四周的边距
             maximum: true,//允许最大化
             loading: ''//加载页面时的提示//可以传入文字，也可以外部用css来定义.dlg-loading的样式
         };
 
     //apply options
-    self.options = $.extend({}, defaults, conf);
-    self.options.dragMargin.top = self.options.dragMargin.top || 0;
-    self.options.dragMargin.bottom = self.options.dragMargin.bottom || 0;
-    self.options.dragMargin.left = self.options.dragMargin.left || 0;
-    self.options.dragMargin.right = self.options.dragMargin.right || 0;
+    self.options = $.extend(true, {}, defaults, conf);
 
     //variable
     var str_dlg = '<div class="dlg-container dlg-zindex">' +
@@ -226,7 +222,7 @@ var dialog = function (conf) {
         var body = getDialogBody(),
             width = body.width(),
             height = body.height();
-        if (!nocache) body.data('before', { width: width, height: height });
+        if (!nocache) body.data('before', { width: width, height: height, position: self.dialog.offset() });
         body.css({
             width: function () { return $(window).width() - 15; },
             height: function () { return $(window).height() - self.dialog.find('.dlg-header').height() - self.dialog.find('.dlg-footer').height() - 15; }
@@ -243,9 +239,13 @@ var dialog = function (conf) {
         self.dialog.find('.dlg-restore').hide();
         var body = getDialogBody(),
             original = body.data('before');
-        if (!original) original = { width: 600, height: 320 };
-        body.css({ width: original.width, height: original.height });
-        setDialogCentral();
+        if (!original){
+            body.css({ width: self.options.width, height: self.options.height });
+            setDialogCentral();
+        }else{
+            body.css({ width: original.width, height: original.height });
+            self.dialog.css({ left: original.position.left, top: original.position.top });
+        }
         self.dialog.find('.dlg-max').css({ display: 'inline-block' }).end().find('.dlg-resize').show();
         setWeightHeight();
         maxed = false;
