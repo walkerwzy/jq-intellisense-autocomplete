@@ -3,7 +3,7 @@
 // [邮    箱] walkerwzy@gmail.com
 // [作者博客] http://walkerwang.cnblogs.com
 // [更新日期] 2013-3-11
-// [版 本 号] ver0.1.0
+// [版 本 号] ver0.1.1
 // [使用说明]
 // $(element).dragable(options)
 // options.namespace(string):命名空间，有默认值
@@ -13,7 +13,7 @@
 //=====================================================================================
 (function ($) {
     $.fn.dragable = function (conf) {
-        var options = $.extend({}, $.fn.dragable.defaults, conf),
+        var options = $.extend(true, {}, $.fn.dragable.defaults, conf),
 		el = options.namespace + "_onmove",
         outer = options.namespace + "_outer";
         $(this).each(function (i, m) {
@@ -34,10 +34,10 @@
 		        y = e.pageY - (mdata.eventy - mdata.offset.top);
 		    }
 		    else {
-		        x = Math.max(0 + (options.offset.left || 0), e.pageX - (mdata.eventx - mdata.offset.left)),
-                y = Math.max(0 + (options.offset.top || 0), e.pageY - (mdata.eventy - mdata.offset.top)),
-                wx = $(window).width() - m.width() - (options.offset.right || 0),
-                wy = $(window).height() - m.height() - (options.offset.bottom || 0);
+		        x = Math.max(0 + options.offset.left, e.pageX - (mdata.eventx - mdata.offset.left)),
+                y = Math.max(0 + options.offset.top, e.pageY - (mdata.eventy - mdata.offset.top)),
+                wx = $(window).width() - m.width() - options.offset.right,
+                wy = $(window).height() - m.height() - options.offset.bottom;
 		        if (x > wx) x = wx;
 		        if (y > wy) y = wy;
 		    }
