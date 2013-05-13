@@ -11,7 +11,7 @@ var dialog = function (conf) {
     var self = this,
         defaults = {
             namespace: "mydialogplug_",//命名空间、ID前缀
-            cover: false,//显示遮罩
+            modal: false,//显示成modal窗体（即有遮罩层）
             dragable: true,//可拖拽
             resizable: false,//可更改大小
             html: '',//加载html字符串
@@ -23,7 +23,8 @@ var dialog = function (conf) {
             outer: false,//允许弹窗被拖到窗体可见区域外
             dragMargin: { top: 0, bottom: 0, left:0, right:0 },//如果outer=false，设定弹窗与窗体四周的边距
             maximum: true,//允许最大化
-            loading: ''//加载页面时的提示//可以传入文字，也可以外部用css来定义.dlg-loading的样式
+            loading: '',//加载页面时的提示//可以传入文字，也可以外部用css来定义.dlg-loading的样式
+            bootstrap: false //是否用bootstrap样式
         };
 
     //apply options
@@ -38,7 +39,17 @@ var dialog = function (conf) {
         '</div>' +
         '<div class="dlg-body"></div>' +
         '<div class="dlg-footer"><div class="dlg-resize"></div></div>' +
-    '</div>',
+        '</div>',
+    str_dlg_bootstrap='<div class="dlg-container dlg-zindex modal" style="width:auto;">'+
+        '<div class="dlg-header modal-header">'+
+          '<div class="dlg-op"><span class="dlg-max" style="display:none;"></span><span class="dlg-restore" style="display:none;"></span>'+
+            '<button type="button" class="close dlg-close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+          '</div>'+
+        '<h3 class="dlg-title">Modal header</h3>'+
+        '</div>'+
+        '<div class="modal-body dlg-body"></div>'+
+        '<div class="modal-footer dlg-footer"><div class="dlg-resize"></div></div>'+
+        '</div>',
     str_cover = '<div class="dlg-cover dlg-zindex"></div>',
     zindex_start = 100000,
     maxed = false,
@@ -46,10 +57,14 @@ var dialog = function (conf) {
     css = {
         cover: { height: '100%', width: '100%', opacity: 0.5, backgroundColor: '#fff', position: 'fixed', top: 0, left: 0, display: 'none', zIndex: 99999 },
         container: { position: 'absolute', top: '50%', left: '50%' },
+        header: { overflow: 'hidden'},
+        option: { float: 'right' },
+        title: { float: 'left' },
+        icon: { float: 'left' },
         close: { cursor: 'pointer' },
         body: { backgroundColor: '#fff', overflow: 'hidden' },
-        loading: {},
-        resize: { position: 'absolute', right: 0, bottom: 0, width: 15, height: 15, cursor: 'nw-resize' }
+        resize: { position: 'absolute', right: 0, bottom: 0, width: 15, height: 15, cursor: 'nw-resize' },
+        loading: {}
     },
     getActiveDialog = function () {
         return $($('.dlg-container').get().sort(function (a, b) { return parseInt($(b).css('z-index'), 10) - parseInt($(a).css('z-index'), 10); })[0]);
@@ -85,9 +100,11 @@ var dialog = function (conf) {
         getDialogBody().find('.dlg-loading').remove();
     };
 
+    if(self.options.bootstrap) str_dlg=str_dlg_bootstrap;
+
     //create cover
     self.cover = null;
-    if (self.options.cover) {
+    if (self.options.modal) {
         if (!self.cover) {
             self.cover = $(str_cover).hide().css(css.cover).css({ zIndex: getMaxZindex() + 1 }).appendTo($('body'));
         }
@@ -103,10 +120,15 @@ var dialog = function (conf) {
 
     //apply style
     self.dialog.css(css.container)
-        .find('.dlg-close').css(css.close)
+        .find('.dlg-header').css(css.header)
+        .find('.dlg-op').css(css.option)
+        .find('.dlg-close').css(css.close).end().end()
+        .end().find('.dlg-title').css(css.title)
+        .end().find('.dlg-icon').css(css.icon)
         .end().find('.dlg-body').css(css.body).css({ width: self.options.width, height: self.options.height })
         .end().find('.dlg-resize').css(css.resize)
         .end().find('.dlg-loading').css(css.loading);
+    if(self.options.bootstrap) self.dialog.find('.modal-body').css('max-height','none');
 
     //attatch event
     self.dialog.on('mousedown', function () {
@@ -197,7 +219,7 @@ var dialog = function (conf) {
         //set active
         $(".dlg-active").removeClass('dlg-active');
         self.dialog.addClass('dlg-active').show();
-        if (self.options.cover) self.cover.show();
+        if (self.options.modal) self.cover.show();
         return self;
     };
     //close the dialog
@@ -209,9 +231,11 @@ var dialog = function (conf) {
         return self;
     };
     //add buttons to the footer
-    self.addBtn = function (name, callback) {
+    self.addBtn = function (name, callback, cssClass) {
         if (typeof callback !== 'function') callback = null;
-        $("<a/>", { text: name, click: callback, href: '#', 'class': 'dlg-btn' }).appendTo(self.dialog.find('.dlg-footer'));
+        cssClass = cssClass || 'dlg-btn';
+        var btn = $("<a/>", { text: name, click: callback, href: '#', 'class': cssClass }).appendTo(self.dialog.find('.dlg-footer'));
+        if(self.options.bootstrap && !btn.is(".btn")) btn.addClass('btn');
         return self;
     };
     //maximum
@@ -221,13 +245,23 @@ var dialog = function (conf) {
         self.dialog.find('.dlg-max').hide();
         var body = getDialogBody(),
             width = body.width(),
-            height = body.height();
+            height = body.height(),
+            header = self.dialog.find('.dlg-header'),
+            footer = self.dialog.find('.dlg-footer'),
+            top = 3,
+            left = 5;
         if (!nocache) body.data('before', { width: width, height: height, position: self.dialog.offset() });
         body.css({
-            width: function () { return $(window).width() - 15; },
-            height: function () { return $(window).height() - self.dialog.find('.dlg-header').height() - self.dialog.find('.dlg-footer').height() - 15; }
+            width: function () { return $(window).width() - parseInt(body.css('padding-left'),10) - parseInt(body.css('padding-right'),10) - self.options.dragMargin.left - self.options.dragMargin.right - left },
+            height: function () { return $(window).height() - header.height() - footer.height()
+                    - parseInt(header.css('padding-top'),10) - parseInt(header.css('padding-bottom'),10)
+                    - parseInt(footer.css('padding-top'),10) - parseInt(footer.css('padding-bottom'),10)
+                    - parseInt(body.css('padding-top'),10) - parseInt(body.css('padding-bottom'),10)
+                    - self.options.dragMargin.top - self.options.dragMargin.bottom
+                    + top;
+                }
         });
-        self.dialog.css({ top: 3, left: 5, margin: 0 })
+        self.dialog.css({ top: top, left: left, margin: 0 })
             .find('.dlg-restore').css({ display: 'inline-block' })
             .end().find('.dlg-resize').hide();
         setWeightHeight();

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bootstrap demo</title>
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <style>
+        body{overflow-y: scroll;}
+        .dlg-container .dlg-header .dlg-op .dlg-max,.dlg-container .dlg-header .dlg-op .dlg-restore{display:inline-block; width:24px; height:24px; overflow: hidden; background:transparent url(img/icon_max.png) -2px -2px no-repeat;  cursor:pointer; }
+        .dlg-container .dlg-header .dlg-op .dlg-restore{background-image: url(img/icon_restore.png); display: none;}
+        .dlg-container .dlg-footer .dlg-resize{ background:transparent url(img/resize.png) right bottom no-repeat;}*/
+    </style>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <style>
+        *{behavior: url(js/PIE.htc);}
+    </style>
+    <![endif]-->
+</head>
+<body style="padding:20px;">
+    <button onclick='showdl9();'>bootstrap</button><button onclick="dl9.close();">hide</button></br/>
+</body>
+<script type="text/javascript" src="js/jquery.js"></script>
+<!--[if (gte IE 6)&(lte IE 8)]>
+<script type="text/javascript" src="js/pie.js"></script>
+<![endif]-->
+<script type="text/javascript" src="js/dragable.js"></script>
+<script type="text/javascript" src="js/dialog.js"></script>
+<script type="text/javascript">
+$(function(){
+    $(".test").css({border:'1px solid gray',borderRadius:5,width:135,background:'#dd1',padding:8}).dragable();
+    // alert($.browser.msie +"," +$.browser.version);
+});
+var dl1,dl2,dl3,dl4,dl5,dl6,dl7,dl8,dl9
+margin={bottom:7,right:7};
+function showdl9(){dl9=new dialog({html:'bootstrap',bootstrap:true,resizable:true, modal:true, dragMargin:margin})
+    .addBtn('ok',function(){if(confirm('save?')) dl9.close();}, 'btn-primary')
+    .addBtn('cancel',function(){dl9.close();}, 'btn-success')
+    .show();
+}
+</script>
+</html>
