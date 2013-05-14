@@ -252,7 +252,7 @@ var dialog = function (conf) {
             left = 5;
         if (!nocache) body.data('before', { width: width, height: height, position: self.dialog.offset() });
         body.css({
-            width: function () { return $(window).width() - parseInt(body.css('padding-left'),10) - parseInt(body.css('padding-right'),10) - self.options.dragMargin.left - self.options.dragMargin.right - left },
+            width: function () { return $(window).width() - parseInt(body.css('padding-left'),10) - parseInt(body.css('padding-right'),10) - self.options.dragMargin.left - self.options.dragMargin.right - left - 10 },
             height: function () { return $(window).height() - header.height() - footer.height()
                     - parseInt(header.css('padding-top'),10) - parseInt(header.css('padding-bottom'),10)
                     - parseInt(footer.css('padding-top'),10) - parseInt(footer.css('padding-bottom'),10)
