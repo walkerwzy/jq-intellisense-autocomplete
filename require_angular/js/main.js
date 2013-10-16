@@ -1,0 +1,28 @@
+require.config({
+	baseUrl:'js/app',
+	paths:{
+		'lib':'../vendor',
+		'test':'../test',
+		'main':'../main'
+	},
+	shim:{
+		'lib/angular':{exports:'angular'}
+	},
+	map:{
+		'*':{'plugin':'test/plugin.1.2'},
+		'test/oldapp':{'plugin':'test/plugin.1.0'}
+	}
+});
+
+require([
+	'lib/angular',
+	'test/newapp',
+	'test/oldapp',
+	'app',
+	'services',
+	'controllers',
+	'filters',
+	'directives'
+],function(angular){	
+	angular.bootstrap(document,['myApp']);
+});
